@@ -1,5 +1,5 @@
 # Swift Projects
-iOS training projects written on Swift by july-august of 2021
+iOS training projects written on Swift during july-august of 2021
 
 * <b>GHFollowers</b> (github followers): layout by code, no libraries, github API
 * <b>H4X0R News</b> (hacker news): basic SwiftUI + Combine, hacker news API

@@ -25,31 +25,23 @@ class NetworkManager {
             return
         }
         
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            if error != nil {
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            guard error == nil,
+                  let response = response as? HTTPURLResponse, response.statusCode == 200,
+                  let data = data else {
                 completed(.failure(.invalidResponse))
-                return
-            }
-            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-                completed(.failure(.invalidResponse))
-                return
-            }
-            guard let safeData = data else {
-                completed(.failure(.invalidData))
                 return
             }
             
             do {
                 let decoder = JSONDecoder()
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
-                let decodedData = try decoder.decode([Follower].self, from: safeData)
+                let decodedData = try decoder.decode([Follower].self, from: data)
                 completed(.success(decodedData))
             } catch {
                 completed(.failure(.invalidData))
             }
-        }
-        
-        task.resume()
+        }.resume()
     }
     
     func getUser(for username: String, completed: @escaping (Result<User, GHFError>) -> Void) {
@@ -60,17 +52,11 @@ class NetworkManager {
             return
         }
         
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            if error != nil {
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            guard error == nil,
+                  let response = response as? HTTPURLResponse, response.statusCode == 200,
+                  let data = data else {
                 completed(.failure(.invalidResponse))
-                return
-            }
-            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-                completed(.failure(.invalidResponse))
-                return
-            }
-            guard let safeData = data else {
-                completed(.failure(.invalidData))
                 return
             }
             
@@ -78,14 +64,12 @@ class NetworkManager {
                 let decoder = JSONDecoder()
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
                 decoder.dateDecodingStrategy = .iso8601
-                let decodedData = try decoder.decode(User.self, from: safeData)
+                let decodedData = try decoder.decode(User.self, from: data)
                 completed(.success(decodedData))
             } catch {
                 completed(.failure(.invalidData))
             }
-        }
-        
-        task.resume()
+        }.resume()
     }
     
     func downloadImage(from urlString: String, completed: @escaping (UIImage?) -> Void) {
@@ -100,7 +84,7 @@ class NetworkManager {
             return
         }
         
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+        URLSession.shared.dataTask(with: url) { data, response, error in
             guard error == nil,
                 let response = response as? HTTPURLResponse, response.statusCode == 200,
                 let data = data,
@@ -111,7 +95,6 @@ class NetworkManager {
             
             self.imageCache.setObject(image, forKey: cacheKey)
             completed(image)
-        }
-        task.resume()
+        }.resume()
     }
 }

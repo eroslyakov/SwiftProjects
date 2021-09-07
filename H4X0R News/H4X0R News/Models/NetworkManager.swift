@@ -18,8 +18,7 @@ class NetworkManager: ObservableObject {
             print("Invalid url")
             return
         }
-        let session = URLSession(configuration: .default)
-        let task = session.dataTask(with: url) { data, response, error in
+        URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
                 print("Data fetching error: %@", error.localizedDescription)
             }
@@ -34,7 +33,6 @@ class NetworkManager: ObservableObject {
                     print("Data decoding error: %@", error.localizedDescription)
                 }
             }
-        }
-        task.resume()
+        }.resume()
     }
 }

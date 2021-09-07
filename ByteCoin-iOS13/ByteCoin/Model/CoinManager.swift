@@ -16,7 +16,7 @@ protocol CoinManagerDelegate {
 struct CoinManager {
     
     let baseURL = "https://rest.coinapi.io/v1/exchangerate/BTC"
-    let apiKey = "42CE934E-C3FE-40CA-8FB0-DC7A90659E7B"
+    let apiKey = "get api key"
     
     let currencyArray = ["AUD", "BRL","CAD","CNY","EUR","GBP","HKD","IDR","ILS","INR","JPY","MXN","NOK","NZD","PLN","RON","RUB","SEK","SGD","USD","ZAR"]
     
@@ -33,23 +33,19 @@ struct CoinManager {
             print("Invalid url")
             return
         }
-        let session = URLSession(configuration: .default)
-        let task = session.dataTask(with: url) { data, response, error in
-            if error != nil {
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            guard let data = data, error == nil else {
                 delegate?.didFailWithError(error: error!)
                 return
             }
-            if let safeData = data {
-                do {
-                    let decoder = JSONDecoder()
-                    decoder.keyDecodingStrategy = .convertFromSnakeCase
-                    let decodedData = try decoder.decode(ExchangeRate.self, from: safeData)
-                    delegate?.didReceiveExchangeRate(decodedData)
-                } catch let error {
-                    delegate?.didFailWithError(error: error)
-                }
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let decodedData = try decoder.decode(ExchangeRate.self, from: data)
+                delegate?.didReceiveExchangeRate(decodedData)
+            } catch let error {
+                delegate?.didFailWithError(error: error)
             }
-        }
-        task.resume()
+        }.resume()
     }
 }
